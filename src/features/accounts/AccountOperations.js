@@ -10,13 +10,15 @@ function AccountOperations() {
   const [currency, setCurrency] = useState("USD");
 
   const dispatch = useDispatch();
-  const {loan: currentLoan, loanPurpose: currentLoanPurpose} = useSelector(store => store.account)
+  const {loan: currentLoan, loanPurpose: currentLoanPurpose, isLoading} = useSelector(store => store.account)
 
   function handleDeposit() {
     if(!depositAmount) return;
 
-    dispatch(deposit(depositAmount));
+    //When the deposit() is called, instead of ending up with the action object here, dispatch() receives an asynchronous function here.Basically we will dispatch a function and when Redux will see the function, it will know that function is the thunk.It will then execute the function and not immediately dispatch the action to the store.
+    dispatch(deposit(depositAmount, currency));
     setDepositAmount("");
+    setCurrency("");
   }
 
   function handleWithdrawal() {
@@ -58,7 +60,7 @@ function AccountOperations() {
             <option value="GBP">British Pound</option>
           </select>
 
-          <button onClick={handleDeposit}>Deposit {depositAmount}</button>
+          <button onClick={handleDeposit} disabled={isLoading}>{isLoading ? 'Converting...' : `Deposit ${depositAmount}`}</button>
         </div>
 
         <div>
