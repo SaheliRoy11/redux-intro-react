@@ -18,6 +18,7 @@ const accountSlice = createSlice({//returns a slice
     deposit(state, action) {
       //Here we are not writing code for the asynchronous data (thunk logic for currency converter) as of now.This is why we are also not writing any logic for 'isLoading' property of state.
       state.balance = state.balance + action.payload;
+      state.isLoading = false;
     },
     withdraw(state, action) {
       state.balance = state.balance - action.payload;
@@ -59,12 +60,28 @@ const accountSlice = createSlice({//returns a slice
       state.loan = 0;
       state.loanPurpose = "";
     },
+    convertingCurrency(state) {
+      state.isLoading = true;
+    }
   },
 });
 
-//console.log(accountSlice);
+export function deposit(amount, currency) {
+  if(currency === 'USD') return { type: "account/deposit", payload: amount };
 
-export const { deposit, withdraw, requestLoan, payLoan } = accountSlice.actions;
+  return async function(dispatch) {//It will internally receive the dispatch function
+    dispatch({type: "account/convertingCurrency"});
+
+    //API Call
+    const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=USD`);
+
+    const data = await res.json();
+    const converted = data.rates.USD;
+    dispatch({ type: "account/deposit", payload: converted });
+  }
+}
+
+export const { withdraw, requestLoan, payLoan } = accountSlice.actions;
 export default accountSlice.reducer;
 
 /*
