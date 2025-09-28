@@ -16,7 +16,9 @@ function AccountOperations() {
     if(!depositAmount) return;
 
     //When the deposit() is called, instead of ending up with the action object here, dispatch() receives an asynchronous function here.Basically we will dispatch a function and when Redux will see the function, it will know that function is the thunk.It will then execute the function and not immediately dispatch the action to the store.
-    dispatch(deposit(depositAmount, currency));
+    //dispatch(deposit(depositAmount, currency));
+    
+    dispatch(deposit(depositAmount));//for testing RTK
     setDepositAmount("");
     setCurrency("USD");
   }
